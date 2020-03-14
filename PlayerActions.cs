@@ -6,10 +6,10 @@ public class PlayerActions : MonoBehaviour
 {
 
     public bool CanInteract = false;
-    public TextMesh Text;
     RaycastHit HitInfo;
     Ray RayOrigin;
    public ActionUIPopup Popup;
+   public Device DeviceObject;
        void Update()
         {
             if(Physics.Raycast(Camera.main.transform.position,Camera.main.transform.forward, out HitInfo, 1.5f)){
@@ -20,10 +20,8 @@ public class PlayerActions : MonoBehaviour
 
 
             if(Input.GetKeyDown(KeyCode.E) && CanInteract){
-                HitInfo.transform.gameObject.GetComponent<Device>().DeviceInteraction();
+               HitInfo.transform.gameObject.transform.parent.GetComponentInParent<Device>().DeviceInteraction(HitInfo.transform.name);
             }
         
         }
-        
-    //}
 }

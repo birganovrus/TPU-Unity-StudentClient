@@ -43,45 +43,32 @@ public class GameHandler : MonoBehaviour
     }
 
     public void SaveData(){
-        JSONClass playerJson = new JSONClass();
-        JSONArray sessionsArray = new JSONArray();
-        JSONClass sessionsDataArray = new JSONClass();
+        JSONArray deviceArray = new JSONArray();
+        JSONClass sessionsData = new JSONClass();
 
         //Sessions Array that contais only IDs of the sessions
         int CurrentSessionID = UserData.SessionCount + 1;
         
         Debug.Log(CurrentSessionID);
-        //Sessions Data Array
-        string Device1Data;
-        string Device2Data;
-        string Device1Log;
-        string Device2Log;
 
-        if(dev1.DeviceData != 0) { Device1Data = dev1.DeviceData.ToString();}
-        else{ Device1Data = "none";}
-
-        if(dev2.DeviceData != 0) { Device2Data = dev2.DeviceData.ToString();}
-        else{ Device2Data = "none";}
-
-        if(dev1.DeviceLog != string.Empty) { Device1Log = dev1.DeviceLog;}
-        else {Device1Log = "none";}
-
-        if(dev2.DeviceLog != string.Empty) { Device2Log = dev2.DeviceLog;}
-        else {Device2Log = "none";}
-
-
-
-        sessionsDataArray.Add("Session_Time",SplayedTimeInHr + ":" + SplayedTimeInMin + ":" + SplayedTimeInSec);
-        sessionsDataArray.Add("Session_DateTime",System.DateTime.Now.ToString());
-        sessionsDataArray.Add("Установка 1 Данные",Device1Data);
-        sessionsDataArray.Add("Установка 2 Данные",Device2Data);
-        sessionsDataArray.Add("Лог установки 1", Device1Log);
-        sessionsDataArray.Add("Лог установки 2", Device2Log);
-        //sessionsArray.Add("Session__data", sessionsDataArray);
-        //playerJson.Add("Session " + CurrentSessionID.ToString(),sessionsArray);
-
-
-        MenuManager.OnSavingData(UserData.Username,UserData.Password,sessionsDataArray.ToString(),CurrentSessionID);
+        sessionsData.Add("Продолжительность сессии",SplayedTimeInHr + ":" + SplayedTimeInMin + ":" + SplayedTimeInSec);
+        sessionsData.Add("Время создания сессии",System.DateTime.Now.ToString());
+        
+        foreach(Device dev in FindObjectsOfType<Device>()){
+            JSONNode deviceObj = new JSONClass();
+            JSONClass deviceData= new JSONClass();
+            JSONClass deviceEvents = new JSONClass();
+            deviceObj.Add("Имя установки",dev.DeviceName);
+            deviceObj.Add("События установки",deviceEvents);
+            deviceObj.Add("Данные установки",deviceData);
+            deviceEvents.Add("Нейтральные",dev.NeutralEvent_Log);
+            deviceEvents.Add("Критические", dev.CriticalEvent_Log);
+            deviceEvents.Add("Успешные", dev.SuccessEvent_Log);
+            deviceData.Add("Данные", dev.DeviceData.ToString());
+            deviceArray.Add(deviceObj);
+        }
+        sessionsData.Add("Установки",deviceArray);
+        MenuManager.OnSavingData(UserData.Username,UserData.Password,sessionsData.ToString(),CurrentSessionID);
         
     }
     public void UpdateDeviceData(GameObject device){
